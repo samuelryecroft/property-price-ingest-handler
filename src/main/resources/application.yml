@@ -1,0 +1,18 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username='${KAFKA_USERNAME}' password='${KAFKA_PASSWORD}';
+      security:
+        protocol: SASL_SSL
+    consumer:
+      auto-offset-reset: earliest
+      group-id: events-framework-notification-processor
+
+  data:
+    mongodb:
+      uri: ${DB_URL}
+      database: ${DB}

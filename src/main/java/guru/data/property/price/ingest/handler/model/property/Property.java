@@ -40,7 +40,7 @@ public class Property {
    * @param property The property details to merge into this property instance.
    */
   public boolean mergePropertyInformation (Property property) {
-    if (property.getLatestTransactionDate().isBefore(LocalDate.now())) {
+    if (property.getLatestTransactionDate().isBefore(latestDataDate)) {
       return false;
     }
 

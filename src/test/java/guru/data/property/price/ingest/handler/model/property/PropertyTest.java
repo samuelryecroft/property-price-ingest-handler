@@ -170,7 +170,7 @@ class PropertyTest {
 
     assertThat(result).isTrue();
     assertThat(existingPropertyData.getPropertyType()).isEqualTo(PropertyType.OTHER);
-    assertThat(existingPropertyData.getLastUpdated()).isCloseTo(LocalDate.now(), within(1, ChronoUnit.SECONDS));
+    assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.now());
   }
 
   @Test
@@ -187,7 +187,7 @@ class PropertyTest {
 
     assertThat(result).isFalse();
     assertThat(existingPropertyData.getPropertyType()).isEqualTo(PropertyType.DETACHED);
-    assertThat(existingPropertyData.getLatestDataDate()).isCloseTo(LocalDate.now(), within(1, ChronoUnit.SECONDS));
+    assertThat(existingPropertyData.getLatestDataDate()).isEqualTo(LocalDate.now());
     assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.MIN);
 
   }
@@ -213,8 +213,8 @@ class PropertyTest {
 
     assertThat(result).isTrue();
     assertThat(existingPropertyData.getPropertyType()).isEqualTo(PropertyType.OTHER);
-    assertThat(existingPropertyData.getLatestDataDate()).isCloseTo(LocalDate.now(), within(1, ChronoUnit.SECONDS));
-    assertThat(existingPropertyData.getLastUpdated()).isCloseTo(LocalDate.now(), within(1, ChronoUnit.SECONDS));
+    assertThat(existingPropertyData.getLatestDataDate()).isEqualTo(LocalDate.now());
+    assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.now());
 
   }
 
@@ -249,7 +249,7 @@ class PropertyTest {
     final Property property = Property.builder().build();
     final LocalDate result = property.getLatestTransactionDate();
 
-    assertThat(result).isEqualTo(Instant.MIN);
+    assertThat(result).isEqualTo(LocalDate.MIN);
   }
 
   @Test

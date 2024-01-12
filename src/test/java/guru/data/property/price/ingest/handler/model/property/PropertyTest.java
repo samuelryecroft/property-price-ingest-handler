@@ -178,17 +178,21 @@ class PropertyTest {
     final Property existingPropertyData = Property.builder()
         .propertyType(PropertyType.DETACHED)
         .latestDataDate(LocalDate.now())
-        .lastUpdated(LocalDate.MIN)
+        .lastUpdated(LocalDate.now())
         .build();
 
-    final Property mergingPropertyData = Property.builder().propertyType(PropertyType.OTHER).build();
+    final Property mergingPropertyData = Property.builder()
+            .propertyType(PropertyType.OTHER)
+            .latestDataDate(LocalDate.EPOCH)
+            .lastUpdated(LocalDate.EPOCH)
+            .build();
 
     final boolean result = existingPropertyData.mergePropertyInformation(mergingPropertyData);
 
     assertThat(result).isFalse();
     assertThat(existingPropertyData.getPropertyType()).isEqualTo(PropertyType.DETACHED);
     assertThat(existingPropertyData.getLatestDataDate()).isEqualTo(LocalDate.now());
-    assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.MIN);
+    assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.now());
 
   }
 
@@ -196,8 +200,8 @@ class PropertyTest {
   void mergePropertyInformationWithNewerMergeDataAcceptsChanges() {
     final Property existingPropertyData = Property.builder()
         .propertyType(PropertyType.DETACHED)
-        .latestDataDate(LocalDate.MIN)
-        .lastUpdated(LocalDate.MIN)
+        .latestDataDate(LocalDate.EPOCH)
+        .lastUpdated(LocalDate.EPOCH)
         .build();
 
     final Property mergingPropertyData = Property.builder()
@@ -207,6 +211,7 @@ class PropertyTest {
                 SaleTransaction.builder().dateOfTransfer(LocalDate.now()).build()
             )
         )
+        .latestDataDate(LocalDate.now())
         .build();
 
     final boolean result = existingPropertyData.mergePropertyInformation(mergingPropertyData);
@@ -222,8 +227,8 @@ class PropertyTest {
   void mergePropertyInformationWithNoChanges() {
     final Property existingPropertyData = Property.builder()
         .propertyType(PropertyType.DETACHED)
-        .latestDataDate(LocalDate.MIN)
-        .lastUpdated(LocalDate.MIN)
+        .latestDataDate(LocalDate.EPOCH)
+        .lastUpdated(LocalDate.EPOCH)
         .build();
 
     final Property mergingPropertyData = Property.builder()
@@ -239,17 +244,17 @@ class PropertyTest {
 
     assertThat(result).isFalse();
     assertThat(existingPropertyData.getPropertyType()).isEqualTo(PropertyType.DETACHED);
-    assertThat(existingPropertyData.getLatestDataDate()).isEqualTo(LocalDate.MIN);
-    assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.MIN);
+    assertThat(existingPropertyData.getLatestDataDate()).isEqualTo(LocalDate.EPOCH);
+    assertThat(existingPropertyData.getLastUpdated()).isEqualTo(LocalDate.EPOCH);
 
   }
 
   @Test
-  void getLatestTransactionDateReturnsMinimumInstantValueWhenNoTransactionsPresent() {
+  void getLatestTransactionDateReturnsEpochValueWhenNoTransactionsPresent() {
     final Property property = Property.builder().build();
     final LocalDate result = property.getLatestTransactionDate();
 
-    assertThat(result).isEqualTo(LocalDate.MIN);
+    assertThat(result).isEqualTo(LocalDate.EPOCH);
   }
 
   @Test

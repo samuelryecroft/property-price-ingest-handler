@@ -30,7 +30,7 @@ public class Property {
   private Location location;
 
   @Builder.Default
-  private LocalDate latestDataDate = LocalDate.now();
+  private LocalDate latestDataDate = LocalDate.EPOCH;
 
   @Builder.Default
   private LocalDate lastUpdated = LocalDate.now();
@@ -40,11 +40,12 @@ public class Property {
    * @param property The property details to merge into this property instance.
    */
   public boolean mergePropertyInformation (Property property) {
-    if (property.getLatestTransactionDate().isBefore(latestDataDate)) {
+
+    if (propertyType.equals(property.getPropertyType())) {
       return false;
     }
 
-    if (this.propertyType != property.getPropertyType()) {
+    if (property.getLatestTransactionDate().isAfter(latestDataDate) || property.getLatestTransactionDate().isEqual(latestDataDate)) {
       this.propertyType = property.getPropertyType();
       this.latestDataDate = property.getLatestTransactionDate();
       this.lastUpdated = LocalDate.now();
@@ -95,10 +96,9 @@ public class Property {
     return setUpdated;
   }
 
-
   public LocalDate getLatestTransactionDate () {
     return transactions.stream()
         .max(Comparator.comparing(SaleTransaction::getDateOfTransfer))
-        .map(SaleTransaction::getDateOfTransfer).orElse(LocalDate.MIN);
+        .map(SaleTransaction::getDateOfTransfer).orElse(LocalDate.EPOCH);
   }
 }

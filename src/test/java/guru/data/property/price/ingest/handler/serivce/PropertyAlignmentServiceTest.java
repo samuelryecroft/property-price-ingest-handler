@@ -3,8 +3,12 @@ package guru.data.property.price.ingest.handler.serivce;
 import guru.data.property.price.ingest.handler.model.input.InputAction;
 import guru.data.property.price.ingest.handler.model.input.PricePaidTransactionInput;
 import guru.data.property.price.ingest.handler.model.property.Property;
+import guru.data.property.price.ingest.handler.model.property.PropertyType;
+import guru.data.property.price.ingest.handler.model.property.SaleTransaction;
 import guru.data.property.price.ingest.handler.repository.PropertyRepository;
 import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +36,8 @@ class PropertyAlignmentServiceTest {
   @Mock
   private Property propertyUpdate;
 
+  private final Set<SaleTransaction> transactions = Set.of(SaleTransaction.builder().id("sale-transaction").build());
+
   @InjectMocks
   PropertyAlignmentService propertyAlignmentService;
 
@@ -43,18 +49,12 @@ class PropertyAlignmentServiceTest {
     when(propertyUpdate.getId()).thenReturn(PROPERTY_ID);
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.empty());
 
-    when(propertyUpdate.addNewTransactions(any())).thenReturn(false);
-    when(propertyUpdate.mergePropertyInformation(propertyUpdate)).thenReturn(false);
 
     when(propertyRepository.save(propertyUpdate)).thenReturn(propertyUpdate);
 
-    final Property result = propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
+    propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    assertThat(result).isEqualTo(propertyUpdate);
 
-    verify(propertyRepository).save(propertyUpdate);
-    verify(propertyUpdate).addNewTransactions(any());
-    verify(propertyUpdate).mergePropertyInformation(propertyUpdate);
     verify(propertyRepository).save(propertyUpdate);
   }
 
@@ -65,18 +65,10 @@ class PropertyAlignmentServiceTest {
     when(propertyUpdate.getId()).thenReturn(PROPERTY_ID);
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.empty());
 
-    when(propertyUpdate.updateTransactions(any())).thenReturn(false);
-    when(propertyUpdate.mergePropertyInformation(propertyUpdate)).thenReturn(false);
-
     when(propertyRepository.save(propertyUpdate)).thenReturn(propertyUpdate);
 
-    final Property result = propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
+    propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    assertThat(result).isEqualTo(propertyUpdate);
-
-    verify(propertyRepository).save(propertyUpdate);
-    verify(propertyUpdate).updateTransactions(any());
-    verify(propertyUpdate).mergePropertyInformation(propertyUpdate);
     verify(propertyRepository).save(propertyUpdate);
   }
 
@@ -88,18 +80,12 @@ class PropertyAlignmentServiceTest {
     when(propertyUpdate.getId()).thenReturn(PROPERTY_ID);
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.empty());
 
-    when(propertyUpdate.deleteTransactions(any())).thenReturn(false);
-    when(propertyUpdate.mergePropertyInformation(propertyUpdate)).thenReturn(false);
 
     when(propertyRepository.save(propertyUpdate)).thenReturn(propertyUpdate);
 
-    final Property result = propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
-
-    assertThat(result).isEqualTo(propertyUpdate);
+   propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
 
-    verify(propertyUpdate).deleteTransactions(any());
-    verify(propertyUpdate).mergePropertyInformation(propertyUpdate);
     verify(propertyRepository).save(propertyUpdate);
   }
 
@@ -108,21 +94,14 @@ class PropertyAlignmentServiceTest {
     final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.ADDITION);
 
     when(propertyUpdate.getId()).thenReturn(PROPERTY_ID);
+    when(existingProperty.getId()).thenReturn(PROPERTY_ID);
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.of(existingProperty));
+    when(propertyUpdate.getTransactions()).thenReturn(transactions);
 
-    when(existingProperty.addNewTransactions(any())).thenReturn(true);
-    when(existingProperty.mergePropertyInformation(propertyUpdate)).thenReturn(false);
+    propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    when(propertyRepository.save(existingProperty)).thenReturn(existingProperty);
 
-    final Property result = propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
-
-    assertThat(result).isEqualTo(existingProperty);
-
-    verify(existingProperty).addNewTransactions(any());
-    verify(existingProperty).mergePropertyInformation(propertyUpdate);
-    verify(propertyRepository).save(existingProperty);
-
+    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions);
   }
 
   @Test
@@ -130,40 +109,18 @@ class PropertyAlignmentServiceTest {
     final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.ADDITION);
 
     when(propertyUpdate.getId()).thenReturn(PROPERTY_ID);
+    when(existingProperty.getId()).thenReturn(PROPERTY_ID);
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.of(existingProperty));
+    when(propertyUpdate.getTransactions()).thenReturn(transactions);
 
-    when(existingProperty.addNewTransactions(any())).thenReturn(false);
-    when(existingProperty.mergePropertyInformation(propertyUpdate)).thenReturn(true);
+    when(propertyUpdate.getPropertyType()).thenReturn(PropertyType.DETACHED);
+    when(existingProperty.getPropertyType()).thenReturn(PropertyType.TERRACED);
 
-    when(propertyRepository.save(existingProperty)).thenReturn(existingProperty);
 
-    final Property result = propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
+    propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    assertThat(result).isEqualTo(existingProperty);
-
-    verify(existingProperty).addNewTransactions(any());
-    verify(existingProperty).mergePropertyInformation(propertyUpdate);
-    verify(propertyRepository).save(existingProperty);
-
-  }
-
-  @Test
-  void alignPropertyRecordOnExistingPropertyWhereNoUpdateRequired() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.ADDITION);
-
-    when(propertyUpdate.getId()).thenReturn(PROPERTY_ID);
-    when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.of(existingProperty));
-
-    when(existingProperty.addNewTransactions(any())).thenReturn(false);
-    when(existingProperty.mergePropertyInformation(propertyUpdate)).thenReturn(false);
-
-    final Property result = propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
-
-    assertThat(result).isEqualTo(existingProperty);
-
-    verify(existingProperty).addNewTransactions(any());
-    verify(existingProperty).mergePropertyInformation(propertyUpdate);
-    verify(propertyRepository, never()).save(existingProperty);
+    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions);
+    verify(propertyRepository).updatePropertyDetails(propertyUpdate);
 
   }
 

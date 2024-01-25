@@ -3,8 +3,11 @@ package guru.data.property.price.ingest.handler.serivce;
 import guru.data.property.price.ingest.handler.model.input.InputAction;
 import guru.data.property.price.ingest.handler.model.input.PricePaidTransactionInput;
 import guru.data.property.price.ingest.handler.model.property.Property;
+import guru.data.property.price.ingest.handler.model.property.SaleTransaction;
 import guru.data.property.price.ingest.handler.repository.PropertyRepository;
 import java.util.Optional;
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,39 +17,32 @@ public class PropertyAlignmentService {
 
   private final PropertyRepository propertyRepository;
 
-  public Property alignPropertyRecord(PricePaidTransactionInput pricePaidTransactionInput) {
+  public void alignPropertyRecord(PricePaidTransactionInput pricePaidTransactionInput) {
     final String propertyId = pricePaidTransactionInput.getProperty().getId();
 
     final Optional<Property> propertyOption = propertyRepository.findById(propertyId);
 
-    final Property propertyRecord = propertyOption.orElse(pricePaidTransactionInput.getProperty());
+    propertyOption.ifPresentOrElse(
+                    pr -> updatePropertyRecord(pr, pricePaidTransactionInput),
+                    () -> propertyRepository.save(pricePaidTransactionInput.getProperty()));
 
-    final boolean propertyHasUpdates = updateProperty(propertyRecord, pricePaidTransactionInput);
-
-    if (propertyOption.isEmpty() || propertyHasUpdates) {
-      return propertyRepository.save(propertyRecord);
-    }
-
-    return propertyRecord;
   }
 
-  private boolean alignPropertyTransactions(Property property, PricePaidTransactionInput pricePaidTransactionInput) {
+  private void updatePropertyRecord(Property savedRecord, PricePaidTransactionInput pricePaidTransactionInput) {
+
     final InputAction inputAction = pricePaidTransactionInput.getInputAction();
+    final Set<SaleTransaction> saleTransactions = pricePaidTransactionInput.getProperty().getTransactions();
 
-    return switch (inputAction){
-      case ADDITION -> property.addNewTransactions(pricePaidTransactionInput.getProperty().getTransactions());
-      case CHANGE -> property.updateTransactions(pricePaidTransactionInput.getProperty().getTransactions());
-      case DELETE -> property.deleteTransactions(property.getTransactions());
+    switch (inputAction){
+      case ADDITION -> propertyRepository.addTransactionsForProperty(savedRecord.getId(), saleTransactions);
+      case CHANGE ->  propertyRepository.updateTransactionForProperty(savedRecord.getId(), saleTransactions);
+      case DELETE -> propertyRepository.removeTransactionsForProperty(savedRecord.getId(), saleTransactions);
     };
+
+    if (savedRecord.getPropertyType() != pricePaidTransactionInput.getProperty().getPropertyType()){
+      propertyRepository.updatePropertyDetails(pricePaidTransactionInput.getProperty());
+    }
   }
 
-  private boolean updateProperty(Property property, PricePaidTransactionInput pricePaidTransactionInput) {
-
-    final boolean propertyDetailsChange = property.mergePropertyInformation(pricePaidTransactionInput.getProperty());
-    final boolean transactionChange = alignPropertyTransactions(property, pricePaidTransactionInput);
-
-    return propertyDetailsChange || transactionChange;
-
-  }
 
 }

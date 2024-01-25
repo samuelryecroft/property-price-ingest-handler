@@ -101,4 +101,6 @@ public class Property {
         .max(Comparator.comparing(SaleTransaction::getDateOfTransfer))
         .map(SaleTransaction::getDateOfTransfer).orElse(LocalDate.EPOCH);
   }
+
+
 }

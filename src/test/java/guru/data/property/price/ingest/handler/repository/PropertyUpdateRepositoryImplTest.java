@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.verify;
@@ -24,8 +23,10 @@ class PropertyUpdateRepositoryImplTest {
 
     private final String PROPERTY_ID = "PROPERTY_ID";
     private final String TRANSACTION_ID = "TRANSACTION_ID";
-    private final Set<SaleTransaction> saleTransaction = Set.of(
-            SaleTransaction.builder().id("TRANSACTION_ID").build()
+
+    private final SaleTransaction saleTransaction = SaleTransaction.builder().id("TRANSACTION_ID").build();
+    private final Set<SaleTransaction> saleTransactions = Set.of(
+            saleTransaction
     );
 
     @Mock
@@ -38,41 +39,50 @@ class PropertyUpdateRepositoryImplTest {
     @Test
     void removeTransactionsUsesExpectedMatchingCriteria() {
 
-        propertyUpdateRepository.removeTransactionsForProperty(PROPERTY_ID, saleTransaction);
+        propertyUpdateRepository.removeTransactionsForProperty(PROPERTY_ID, saleTransactions);
 
         verify(mongoTemplate).updateFirst(
                 query(where("_id").is(PROPERTY_ID)),
                 new Update()
-                        .pull("transactions", query(Criteria.where("transactions$_id)").in(List.of(TRANSACTION_ID))))
+                        .pull("transactions", query(Criteria.where("_id").is(TRANSACTION_ID)))
                         .set("lastUpdated", LocalDate.now()),
                 Property.class
         );
     }
 
     @Test
-    void updateTransactionsUsesExpectedMatchingCriteria() {
+     void updateTransactionsUsesExpectedMatchingCriteria() {
 
-        propertyUpdateRepository.updateTransactionForProperty(PROPERTY_ID, saleTransaction);
+        propertyUpdateRepository.updateTransactionForProperty(PROPERTY_ID, saleTransactions);
 
         verify(mongoTemplate).updateFirst(
                 query(where("_id").is(PROPERTY_ID)),
                 new Update()
-                        .pull("transactions", query(Criteria.where("transactions$_id)").in(List.of(TRANSACTION_ID))))
-                        .push("transactions").each(saleTransaction)
+                        .pull("transactions", query(Criteria.where("_id").is(TRANSACTION_ID)))
+                        .set("lastUpdated", LocalDate.now()),
+                Property.class
+        );
+
+        verify(mongoTemplate).updateFirst(
+                query(where("_id").is(PROPERTY_ID)),
+                new Update()
+                        .push("transactions").each(saleTransactions)
                         .set("lastUpdated", LocalDate.now()),
                 Property.class
         );
     }
+
 
     @Test
     void addTransactionsUsesExpectedMatchingCriteria() {
 
-        propertyUpdateRepository.addTransactionsForProperty(PROPERTY_ID, saleTransaction);
+        propertyUpdateRepository.addTransactionsForProperty(PROPERTY_ID, saleTransactions);
 
         verify(mongoTemplate).updateFirst(
-                query(where("_id").is(PROPERTY_ID)),
+                query(where("_id").is(PROPERTY_ID)
+                        .and("transactions").not().elemMatch(Criteria.where("_id").is(TRANSACTION_ID))),
                 new Update()
-                        .push("transactions").each(saleTransaction)
+                        .push("transactions", saleTransaction)
                         .set("lastUpdated", LocalDate.now()),
                 Property.class
         );

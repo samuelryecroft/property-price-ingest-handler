@@ -1,8 +1,5 @@
 spring:
-  rabbitmq:
-    host: portainer.samryecroft.ninja
-    username: sam
-    password: Jz391078c!337
+
   data:
     mongodb:
       uri: ${DB_URL}

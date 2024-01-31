@@ -17,7 +17,7 @@ public class PropertyEventConsumer {
 
     private final PropertyAlignmentService propertyAlignmentService;
 
-    @RabbitListener(queues = "property-price-paid", concurrency = "80")
+    @RabbitListener(queues = "property-price-paid")
     public void pricePaidImportHandler(PricePaidTransactionInput pricePaidTransaction) {
 
         propertyAlignmentService.alignPropertyRecord(pricePaidTransaction);

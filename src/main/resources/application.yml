@@ -4,3 +4,7 @@ spring:
     mongodb:
       uri: ${DB_URL}
       database: ${DB}
+
+rabbit-mq-consumer:
+  concurrent-consumers: 40
+  prefetch-count: 300

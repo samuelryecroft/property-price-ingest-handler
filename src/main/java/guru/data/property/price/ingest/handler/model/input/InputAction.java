@@ -13,7 +13,7 @@ public enum InputAction {
 
   private static final Map<String, InputAction> ENUM_MAP;
 
-  String value;
+  final String value;
 
   InputAction(String value) {
     this.value = value;

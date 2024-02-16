@@ -4,11 +4,11 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import javax.xml.stream.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@With
 public class Property {
 
   private String id;
@@ -27,7 +28,7 @@ public class Property {
   @Builder.Default
   private Set<SaleTransaction> transactions = new HashSet<>();
 
-  private Location location;
+  private GeoLocation location;
 
   @Builder.Default
   private LocalDate latestDataDate = LocalDate.EPOCH;

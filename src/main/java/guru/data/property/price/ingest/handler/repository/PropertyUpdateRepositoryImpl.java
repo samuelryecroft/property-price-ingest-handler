@@ -1,5 +1,6 @@
 package guru.data.property.price.ingest.handler.repository;
 
+import guru.data.property.price.ingest.handler.model.property.GeoLocation;
 import guru.data.property.price.ingest.handler.model.property.Property;
 import guru.data.property.price.ingest.handler.model.property.SaleTransaction;
 import lombok.AllArgsConstructor;
@@ -68,11 +69,21 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
     public void updatePropertyDetails(Property property) {
 
         mongoTemplate.updateFirst(
-                query(where("_id").is(property).and("latestDataDate").lte(property.getLatestTransactionDate())),
+                query(where("_id").is(property.getId()).and("latestDataDate").lte(property.getLatestTransactionDate())),
                 new Update()
                         .set("propertyType", property.getPropertyType())
                         .set("latestDataDate", property.getLatestTransactionDate())
                         .set("lastUpdated", LocalDate.now()),
+                Property.class
+        );
+    }
+
+    @Override
+    public void updatePropertyLocation(Property property, GeoLocation geoLocation) {
+        mongoTemplate.updateFirst(
+                query(where("_id").is(property.getId()).and("latestDataDate").lte(property.getLatestTransactionDate())),
+                new Update()
+                        .set("location", geoLocation),
                 Property.class
         );
     }

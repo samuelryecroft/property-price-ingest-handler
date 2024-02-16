@@ -7,5 +7,5 @@ import lombok.Value;
 @Value
 public class GeoLocation {
   String type;
-  Float[] coordinates;
+  float[] coordinates;
 }

@@ -33,8 +33,8 @@ public class PostCodeGeoCodingService {
       return Optional.empty();
     }
 
-    return postCodeIoRepository.getPostCodeLocation(postCode)
-        .map(geoLocationMapper::postcodeLocationToGeoLocation);
-
+    return
+        postCodeIoRepository.getPostCodeEntityByPostcode(postCode)
+            .map(geoLocationMapper::postcodeLocationToGeoLocation);
   }
 }

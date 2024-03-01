@@ -5,7 +5,7 @@ public enum TransactionCategory {
   STANDARD_PRICE_PAID("A"),
   ADDITIONAL_PRICE_PAID("B");
 
-  private String value;
+  private final String value;
 
   TransactionCategory(String value) {
     this.value = value;

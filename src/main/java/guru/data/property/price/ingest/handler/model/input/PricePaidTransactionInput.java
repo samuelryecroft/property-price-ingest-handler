@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class PricePaidTransactionInput {
+
   private InputAction inputAction;
   private Property property;
 }

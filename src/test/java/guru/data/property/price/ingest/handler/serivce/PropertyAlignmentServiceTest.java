@@ -13,6 +13,7 @@ import guru.data.property.price.ingest.handler.model.property.Property;
 import guru.data.property.price.ingest.handler.model.property.PropertyType;
 import guru.data.property.price.ingest.handler.model.property.SaleTransaction;
 import guru.data.property.price.ingest.handler.repository.PropertyRepository;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -30,12 +31,14 @@ class PropertyAlignmentServiceTest {
 
   private static final String POSTCODE = "BS32 0AL";
 
+  private static final LocalDate DATEUPDATED = LocalDate.now();
+
   private static final Set<SaleTransaction> transactions = Set.of(
-      SaleTransaction.builder().id("sale-transaction").build());
+      SaleTransaction.builder().id("sale-transaction").dateOfTransfer(DATEUPDATED).build());
 
   private static final GeoLocation location = GeoLocation.builder()
       .type("Point")
-      .coordinates(new float[]{51.545754f, -2.559503f})
+      .coordinates(new double[]{51.545754d, -2.559503d})
       .build();
 
   private final Property existingProperty = Property.builder()
@@ -44,7 +47,6 @@ class PropertyAlignmentServiceTest {
       .transactions(transactions)
       .propertyType(PropertyType.DETACHED)
       .build();
-  ;
 
   private final Property propertyUpdate = Property.builder()
       .id(PROPERTY_ID)
@@ -52,31 +54,25 @@ class PropertyAlignmentServiceTest {
       .transactions(transactions)
       .propertyType(PropertyType.DETACHED)
       .build();
-
+  @InjectMocks
+  PropertyAlignmentService propertyAlignmentService;
   @Mock
   private PropertyRepository propertyRepository;
-
   @Mock
   private PostCodeGeoCodingService postCodeGeoCodingService;
-
   @Captor
   private ArgumentCaptor<Property> propertyArgumentCaptor;
 
-  @InjectMocks
-  PropertyAlignmentService propertyAlignmentService;
-
-
   @Test
   void alignPropertyRecordOnNewPropertyForAddition() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.ADDITION);
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.ADDITION);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.empty());
-
 
     when(propertyRepository.save(propertyUpdate)).thenReturn(propertyUpdate);
 
     propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
-
 
     verify(propertyRepository).save(propertyUpdate);
   }
@@ -106,7 +102,8 @@ class PropertyAlignmentServiceTest {
 
   @Test
   void alignPropertyRecordOnNewPropertyForUpdate() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.CHANGE);
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.CHANGE);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.empty());
 
@@ -120,10 +117,10 @@ class PropertyAlignmentServiceTest {
 
   @Test
   void alignPropertyRecordOnNewPropertyForDeletion() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.DELETE);
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.DELETE);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.empty());
-
 
     when(propertyRepository.save(propertyArgumentCaptor.capture())).thenReturn(propertyUpdate);
 
@@ -137,65 +134,65 @@ class PropertyAlignmentServiceTest {
 
   @Test
   void alignPropertyRecordOnExistingPropertyWhereTransactionUpdateRequired() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.ADDITION);
-
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.ADDITION);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.of(existingProperty));
 
     propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-
-    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions);
+    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions, DATEUPDATED);
     verify(propertyRepository, never()).updatePropertyDetails(propertyUpdate);
   }
 
   @Test
   void alignPropertyRecordOnExistingPropertyWherePropertyUpdateRequiredForAdditionalTransaction() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.ADDITION);
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.ADDITION);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(
         Optional.of(existingProperty.withPropertyType(PropertyType.TERRACED)));
 
-
     propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions);
+    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions, DATEUPDATED);
     verify(propertyRepository).updatePropertyDetails(propertyUpdate);
 
   }
 
   @Test
   void alignPropertyRecordOnExistingPropertyWherePropertyUpdateRequiredForChangeTransaction() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.CHANGE);
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.CHANGE);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(
         Optional.of(existingProperty.withPropertyType(PropertyType.TERRACED)));
 
-
     propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    verify(propertyRepository).updateTransactionForProperty(PROPERTY_ID, transactions);
+    verify(propertyRepository).updateTransactionForProperty(PROPERTY_ID, transactions, DATEUPDATED);
     verify(propertyRepository).updatePropertyDetails(propertyUpdate);
 
   }
 
   @Test
   void alignPropertyRecordOnExistingPropertyWherePropertyUpdateRequiredForDeleteTransaction() {
-    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(InputAction.DELETE);
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.DELETE);
 
     when(propertyRepository.findById(PROPERTY_ID)).thenReturn(
         Optional.of(existingProperty.withPropertyType(PropertyType.TERRACED)));
 
-
     propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
 
-    verify(propertyRepository).removeTransactionsForProperty(PROPERTY_ID, transactions);
+    verify(propertyRepository).removeTransactionsForProperty(PROPERTY_ID, transactions, DATEUPDATED);
     verify(propertyRepository).updatePropertyDetails(propertyUpdate);
 
   }
 
   private PricePaidTransactionInput getPricePaidTransactionInput(InputAction inputAction) {
-    return PricePaidTransactionInput.builder().inputAction(inputAction).property(propertyUpdate).build();
+    return PricePaidTransactionInput.builder().inputAction(inputAction).property(propertyUpdate)
+        .build();
   }
 
 }

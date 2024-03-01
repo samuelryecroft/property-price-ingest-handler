@@ -7,7 +7,7 @@ public enum Tenure {
 
   UNKNOWN("U");
 
-  private String value;
+  private final String value;
 
   Tenure(String value) {
     this.value = value;

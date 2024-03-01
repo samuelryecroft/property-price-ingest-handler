@@ -6,6 +6,7 @@ import lombok.Value;
 @Builder
 @Value
 public class GeoLocation {
+
   String type;
-  float[] coordinates;
+  double[] coordinates;
 }

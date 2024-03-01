@@ -13,16 +13,6 @@ public enum InputAction {
 
   private static final Map<String, InputAction> ENUM_MAP;
 
-  final String value;
-
-  InputAction(String value) {
-    this.value = value;
-  }
-
-  public String value() {
-    return this.value;
-  }
-
   static {
     Map<String, InputAction> map = new ConcurrentHashMap<>();
     for (InputAction instance : InputAction.values()) {
@@ -31,8 +21,18 @@ public enum InputAction {
     ENUM_MAP = Collections.unmodifiableMap(map);
   }
 
+  final String value;
+
+  InputAction(String value) {
+    this.value = value;
+  }
+
   public static InputAction get(String value) {
     return Optional.ofNullable(ENUM_MAP.get(value.toUpperCase()))
-            .orElseThrow(() -> new RuntimeException(value));
+        .orElseThrow(() -> new RuntimeException(value));
+  }
+
+  public String value() {
+    return this.value;
   }
 }

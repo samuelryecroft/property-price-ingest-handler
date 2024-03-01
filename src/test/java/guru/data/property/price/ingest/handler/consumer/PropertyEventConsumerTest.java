@@ -1,5 +1,7 @@
 package guru.data.property.price.ingest.handler.consumer;
 
+import static org.mockito.Mockito.verify;
+
 import guru.data.property.price.ingest.handler.model.input.PricePaidTransactionInput;
 import guru.data.property.price.ingest.handler.serivce.PropertyAlignmentService;
 import org.junit.jupiter.api.Test;
@@ -8,25 +10,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 class PropertyEventConsumerTest {
 
-    @Mock
-    private PropertyAlignmentService propertyAlignmentService;
+  @Mock
+  private PropertyAlignmentService propertyAlignmentService;
 
-    @InjectMocks
-    private PropertyEventConsumer propertyEventConsumer;
+  @InjectMocks
+  private PropertyEventConsumer propertyEventConsumer;
 
-    @Mock
-    private PricePaidTransactionInput pricePaidTransactionInput;
+  @Mock
+  private PricePaidTransactionInput pricePaidTransactionInput;
 
-    @Test
-    void consumerInvokesExpectedMethods() {
 
-        propertyEventConsumer.pricePaidImportHandler(pricePaidTransactionInput);
+   @Test
+   void consumerInvokesExpectedMethods() {
 
-        verify(propertyAlignmentService).alignPropertyRecord(pricePaidTransactionInput);
-    }
+   propertyEventConsumer.pricePaidImportHandler(pricePaidTransactionInput);
+
+   verify(propertyAlignmentService).alignPropertyRecord(pricePaidTransactionInput);
+   }
+
 }

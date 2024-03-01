@@ -37,16 +37,19 @@ public class Property {
   private LocalDate lastUpdated = LocalDate.now();
 
   /**
-   * Aligns property details with a comparable property ensuring that attributes of a property remain up to date.
+   * Aligns property details with a comparable property ensuring that attributes of a property
+   * remain up to date.
+   *
    * @param property The property details to merge into this property instance.
    */
-  public boolean mergePropertyInformation (Property property) {
+  public boolean mergePropertyInformation(Property property) {
 
     if (propertyType.equals(property.getPropertyType())) {
       return false;
     }
 
-    if (property.getLatestTransactionDate().isAfter(latestDataDate) || property.getLatestTransactionDate().isEqual(latestDataDate)) {
+    if (property.getLatestTransactionDate().isAfter(latestDataDate)
+        || property.getLatestTransactionDate().isEqual(latestDataDate)) {
       this.propertyType = property.getPropertyType();
       this.latestDataDate = property.getLatestTransactionDate();
       this.lastUpdated = LocalDate.now();
@@ -57,7 +60,9 @@ public class Property {
   }
 
   /**
-   * Adds a set of transactions to the existing transactions of a property, duplicate transactions will be removed.
+   * Adds a set of transactions to the existing transactions of a property, duplicate transactions
+   * will be removed.
+   *
    * @param transactionsToAdd The transactions to add to a property.
    * @return returns if the update resulted in a change to the underlying set of transactions.
    */
@@ -69,11 +74,12 @@ public class Property {
     }
 
     return setUpdated;
-    }
+  }
 
   /**
-   * Updates or adds transactions based on an update set, where a property does not have a transaction to update this
-   * method acts in the same way as the add functionality.
+   * Updates or adds transactions based on an update set, where a property does not have a
+   * transaction to update this method acts in the same way as the add functionality.
+   *
    * @param transactionsToUpdate The set of transactions to update or add.
    * @return returns if the update resulted in the change of the underlying set.
    */
@@ -84,6 +90,7 @@ public class Property {
 
   /**
    * Removes transactions from the transactions set based on a set of transactions to remove.
+   *
    * @param transactionsToRemove The set of transactions to remove.
    * @return returns if the deletion resulted a change in the underlying sets of transactions.
    */
@@ -97,7 +104,7 @@ public class Property {
     return setUpdated;
   }
 
-  public LocalDate getLatestTransactionDate () {
+  public LocalDate getLatestTransactionDate() {
     return transactions.stream()
         .max(Comparator.comparing(SaleTransaction::getDateOfTransfer))
         .map(SaleTransaction::getDateOfTransfer).orElse(LocalDate.EPOCH);

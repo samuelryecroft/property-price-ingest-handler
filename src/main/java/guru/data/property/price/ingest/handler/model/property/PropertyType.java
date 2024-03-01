@@ -7,7 +7,7 @@ public enum PropertyType {
   FLAT_MAISONETTES("F"),
   OTHER("O");
 
-  private String value;
+  private final String value;
 
   PropertyType(String value) {
     this.value = value;

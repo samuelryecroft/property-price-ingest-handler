@@ -1,8 +1,8 @@
 package guru.data.property.price.ingest.handler.model.property;
 
-import java.time.Instant;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 class PropertyTest {
 
@@ -35,7 +32,6 @@ class PropertyTest {
     final Set<SaleTransaction> existingTransactions = new HashSet<>(Collections.singletonList(
         SaleTransaction.builder().id("transaction-id-1").build()
     ));
-
 
     final Property property = Property.builder().transactions(existingTransactions).build();
 
@@ -65,7 +61,7 @@ class PropertyTest {
         SaleTransaction.builder().id("transaction-id-1").build()
     );
 
-    final boolean result =property.addNewTransactions(newTransactions);
+    final boolean result = property.addNewTransactions(newTransactions);
 
     assertThat(result).isFalse();
     Assertions.assertThat(property.getTransactions()).containsAll(existingTransactions);
@@ -136,7 +132,6 @@ class PropertyTest {
             existingTransactions.stream(), transactionsToUpdate.stream())
         .collect(Collectors.toSet());
 
-
     assertThat(result).isTrue();
     Assertions.assertThat(property.getTransactions()).containsAll(expectedTransactionSet);
   }
@@ -162,9 +157,11 @@ class PropertyTest {
 
   @Test
   void mergePropertyInformationWithNoDatesAcceptsUpdates() {
-    final Property existingPropertyData = Property.builder().propertyType(PropertyType.DETACHED).build();
+    final Property existingPropertyData = Property.builder().propertyType(PropertyType.DETACHED)
+        .build();
 
-    final Property mergingPropertyData = Property.builder().propertyType(PropertyType.OTHER).build();
+    final Property mergingPropertyData = Property.builder().propertyType(PropertyType.OTHER)
+        .build();
 
     final boolean result = existingPropertyData.mergePropertyInformation(mergingPropertyData);
 
@@ -182,10 +179,10 @@ class PropertyTest {
         .build();
 
     final Property mergingPropertyData = Property.builder()
-            .propertyType(PropertyType.OTHER)
-            .latestDataDate(LocalDate.EPOCH)
-            .lastUpdated(LocalDate.EPOCH)
-            .build();
+        .propertyType(PropertyType.OTHER)
+        .latestDataDate(LocalDate.EPOCH)
+        .lastUpdated(LocalDate.EPOCH)
+        .build();
 
     final boolean result = existingPropertyData.mergePropertyInformation(mergingPropertyData);
 

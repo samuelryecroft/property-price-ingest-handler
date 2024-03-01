@@ -4,7 +4,12 @@ spring:
     mongodb:
       uri: ${DB_URL}
       database: ${DB}
-
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 rabbit-mq-consumer:
   concurrent-consumers: 40
   prefetch-count: 300

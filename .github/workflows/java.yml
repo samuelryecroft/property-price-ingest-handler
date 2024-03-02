@@ -44,7 +44,7 @@ jobs:
 
     - name: Dependency check
       run: mvn dependency-check:check
-  0c6e7340bcfe3d9a94c6bf188ab632fea98bdda2
+
   analise:
     needs: verify
     runs-on: ubuntu-latest

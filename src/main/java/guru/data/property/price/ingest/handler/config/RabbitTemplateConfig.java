@@ -33,7 +33,6 @@ public class RabbitTemplateConfig {
     simpleRabbitListenerContainerFactory.setConcurrentConsumers(concurrentConsumers);
     simpleRabbitListenerContainerFactory.setMessageConverter(rabbitMessageConverter);
 
-    System.out.println("Factory built");
     return simpleRabbitListenerContainerFactory;
   }
 
@@ -43,19 +42,16 @@ public class RabbitTemplateConfig {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(rabbitMqConnectionFactory);
     rabbitTemplate.setMessageConverter(rabbitMessageConverter);
 
-    System.out.println("Template built");
     return rabbitTemplate;
   }
 
   @Bean
   public Jackson2JsonMessageConverter rabbitMessageConverter(ObjectMapper objectMapper) {
-    System.out.println("Converter built");
     return new Jackson2JsonMessageConverter(objectMapper);
   }
 
   @Bean
   public ObjectMapper objectMapper() {
-    System.out.println("Mapper built");
     return new ObjectMapper().registerModule(new JavaTimeModule());
   }
 

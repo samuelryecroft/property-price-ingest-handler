@@ -26,17 +26,15 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
   @Override
   public void removeTransactionsForProperty(String propertyId, Set<SaleTransaction> transactions, LocalDate latestDataDate) {
 
-    transactions.forEach(transaction -> {
+    transactions.forEach(transaction ->
       mongoTemplate.updateFirst(
           query(where("_id").is(propertyId)),
           new Update()
               .pull("transactions", new Query(Criteria.where("_id").is(transaction.getId())))
               .set("lastUpdated", LocalDate.now())
               .set("latestDataDate", latestDataDate),
-
-          Property.class);
-
-    });
+          Property.class)
+    );
   }
 
   @Override
@@ -55,7 +53,7 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
   @Override
   public void addTransactionsForProperty(String propertyId, Set<SaleTransaction> transactions, LocalDate latestDataDate) {
 
-    transactions.forEach(transaction -> {
+    transactions.forEach(transaction ->
       mongoTemplate.updateFirst(
           query(where("_id").is(propertyId)
               .and("transactions").not().elemMatch(Criteria.where("_id").is(transaction.getId()))),
@@ -63,8 +61,8 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
               .push("transactions", transaction)
               .set("lastUpdated", LocalDate.now())
               .set("latestDataDate", latestDataDate),
-          Property.class);
-    });
+          Property.class)
+    );
 
   }
 

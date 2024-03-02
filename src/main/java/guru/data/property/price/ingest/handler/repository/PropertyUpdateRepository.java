@@ -5,7 +5,6 @@ import guru.data.property.price.ingest.handler.model.property.Property;
 import guru.data.property.price.ingest.handler.model.property.SaleTransaction;
 import java.time.LocalDate;
 import java.util.Set;
-import org.springframework.cglib.core.Local;
 
 public interface PropertyUpdateRepository {
 

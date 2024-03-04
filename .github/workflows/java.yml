@@ -49,7 +49,7 @@ jobs:
       run: echo $SONAR_TOKEN
 
       env:
-        SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+        SONAR_TOKEN: 40be2394d3bef8297920696966c7c832fee34b35
 
   build:
     needs: verify

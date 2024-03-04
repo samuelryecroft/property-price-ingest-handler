@@ -13,7 +13,6 @@
   <artifactId>property-data-import-event-handler</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>property-data-import-event-handler</name>
-  <description>property-data-import-event-handler</description>
   <properties>
     <java.version>17</java.version>
     <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/coverage-reports/jacoco-ut/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>

@@ -48,7 +48,7 @@ jobs:
     - name: Sonar check
       run:  mvn sonar:sonar
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
 
   build:
     needs: verify

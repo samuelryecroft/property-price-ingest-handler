@@ -13,7 +13,6 @@ public class PropertyEventConsumer {
 
   private final PropertyAlignmentService propertyAlignmentService;
 
-
   @RabbitListener(queues = "price-paid-ingest")
   public void pricePaidImportHandler(PricePaidTransactionInput pricePaidTransaction) {
     propertyAlignmentService.alignPropertyRecord(pricePaidTransaction);

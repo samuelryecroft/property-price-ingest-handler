@@ -89,6 +89,4 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
         Property.class
     );
   }
-
-
 }

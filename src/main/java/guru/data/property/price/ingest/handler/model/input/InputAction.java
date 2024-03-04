@@ -27,10 +27,6 @@ public enum InputAction {
     this.value = value;
   }
 
-  public static InputAction get(String value) {
-    return Optional.ofNullable(ENUM_MAP.get(value.toUpperCase()))
-        .orElseThrow(() -> new RuntimeException(value));
-  }
 
   public String value() {
     return this.value;

@@ -45,6 +45,9 @@ jobs:
     - name: Dependency check
       run: mvn dependency-check:check
 
+    - name: Sonar check
+      run:  mvn sonar:sonar
+
   build:
     needs: verify
     runs-on: ubuntu-latest

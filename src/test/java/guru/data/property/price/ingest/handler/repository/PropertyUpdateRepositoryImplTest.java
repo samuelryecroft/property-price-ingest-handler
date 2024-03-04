@@ -1,10 +1,13 @@
 package guru.data.property.price.ingest.handler.repository;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+import guru.data.property.price.ingest.handler.model.property.GeoLocation;
 import guru.data.property.price.ingest.handler.model.property.Property;
+import guru.data.property.price.ingest.handler.model.property.PropertyType;
 import guru.data.property.price.ingest.handler.model.property.SaleTransaction;
 import java.time.LocalDate;
 import java.util.Set;
@@ -33,6 +36,13 @@ class PropertyUpdateRepositoryImplTest {
 
   @Mock
   private MongoTemplate mongoTemplate;
+
+  @Mock
+  private GeoLocation geoLocation;
+
+
+  @Mock
+  private Property property;
 
   @InjectMocks
   private PropertyUpdateRepositoryImpl propertyUpdateRepository;
@@ -90,6 +100,42 @@ class PropertyUpdateRepositoryImplTest {
             .push("transactions", saleTransaction)
             .set("lastUpdated", LocalDate.now())
             .set("latestDataDate", LATEST_DATA_DATE),
+        Property.class
+    );
+  }
+
+  @Test
+  void updatePropertyDetailsUseExpectedMatchingCriteria() {
+
+    when(property.getId()).thenReturn(PROPERTY_ID);
+    when(property.getLatestTransactionDate()).thenReturn(LATEST_DATA_DATE);
+    when(property.getPropertyType()).thenReturn(PropertyType.DETACHED);
+
+    propertyUpdateRepository.updatePropertyDetails(property);
+
+    verify(mongoTemplate).updateFirst(
+        query(where("_id").is(PROPERTY_ID)
+            .and("latestDataDate").lte(LATEST_DATA_DATE)),
+        new Update()
+            .set("propertyType", PropertyType.DETACHED)
+            .set("latestDataDate", LATEST_DATA_DATE),
+        Property.class
+    );
+  }
+
+  @Test
+  void updatePropertyLocationUsesExpectedMatchingCriteria() {
+
+    when(property.getId()).thenReturn(PROPERTY_ID);
+    when(property.getLatestTransactionDate()).thenReturn(LATEST_DATA_DATE);
+
+    propertyUpdateRepository.updatePropertyLocation(property, geoLocation);
+
+    verify(mongoTemplate).updateFirst(
+        query(where("_id").is(PROPERTY_ID)
+            .and("latestDataDate").lte(LATEST_DATA_DATE)),
+        new Update()
+            .set("location", geoLocation),
         Property.class
     );
   }

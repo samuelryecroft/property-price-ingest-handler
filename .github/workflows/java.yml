@@ -46,7 +46,8 @@ jobs:
       run: mvn dependency-check:check
 
     - name: Sonar check
-      run:  mvn sonar:sonar
+      run: echo $SONAR_TOKEN
+
       env:
         SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
 

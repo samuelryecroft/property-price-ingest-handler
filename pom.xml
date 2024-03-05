@@ -23,7 +23,6 @@
     <sonar.coverage.exclusions>
       **/guru/data/property/price/ingest/handler/model/**/**
       **/guru/data/property/price/ingest/config/**
-      **/guru/data/property/price/ingest/handler/PropertyDataImportEventHandlerApplication.java
     </sonar.coverage.exclusions>
 
   </properties>

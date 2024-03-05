@@ -20,7 +20,10 @@
     <sonar.organization>samuelryecroft</sonar.organization>
     <sonar.token>${env.SONAR_TOKEN}</sonar.token>
     <sonar.projectKey>property-data-import-event-handler</sonar.projectKey>
-    <sonar.></sonar.>
+    <sonar.coverage.exclusions>
+      **/guru/data/property/price/ingest/handler/model/**/**
+    </sonar.coverage.exclusions>
+
   </properties>
   <dependencies>
     <dependency>

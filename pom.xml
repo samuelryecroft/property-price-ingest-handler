@@ -22,7 +22,6 @@
     <sonar.projectKey>property-data-import-event-handler</sonar.projectKey>
     <sonar.coverage.exclusions>
       **/guru/data/property/price/ingest/handler/model/**/**
-      **/guru/data/property/price/ingest/config/**
     </sonar.coverage.exclusions>
 
   </properties>

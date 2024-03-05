@@ -2,7 +2,6 @@ package guru.data.property.price.ingest.handler.model.input;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum InputAction {

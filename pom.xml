@@ -127,6 +127,7 @@
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.10</version>
         <executions>
+
           <execution>
             <id>pre-unit-test</id>
             <goals>
@@ -137,6 +138,7 @@
               <propertyName>surefireArgLine</propertyName>
             </configuration>
           </execution>
+
           <execution>
             <id>report-aggregate</id>
             <phase>verify</phase>
@@ -144,6 +146,7 @@
               <goal>report-aggregate</goal>
             </goals>
           </execution>
+
           <execution>
             <id>post-unit-test</id>
             <phase>test</phase>
@@ -156,6 +159,7 @@
               <formats>HTML,XML</formats>
             </configuration>
           </execution>
+
         </executions>
       </plugin>
 
@@ -204,6 +208,18 @@
           </excludes>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>3.4.1</version>
+        <configuration>
+          <to>
+            <image>${env.REGISTRY}/${env.IMAGE_NAME}</image>
+          </to>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 

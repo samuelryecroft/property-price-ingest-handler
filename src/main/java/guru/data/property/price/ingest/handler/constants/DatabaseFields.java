@@ -2,6 +2,7 @@ package guru.data.property.price.ingest.handler.constants;
 
 public class DatabaseFields {
 
+  private DatabaseFields(){}
   public static final String TRANSACTION_FIELD = "transactions";
 
   public static final String LAST_UPDATED_FIELD = "lastUpdated";

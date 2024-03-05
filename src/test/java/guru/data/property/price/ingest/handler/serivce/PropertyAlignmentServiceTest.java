@@ -146,6 +146,23 @@ class PropertyAlignmentServiceTest {
   }
 
   @Test
+  void alignPropertyRecordOnExistingPropertyWhereTransactionUpdateRequiredAndLocationFound() {
+    final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
+        InputAction.ADDITION);
+
+    when(propertyRepository.findById(PROPERTY_ID)).thenReturn(Optional.of(existingProperty));
+
+    when(postCodeGeoCodingService.getGeoLocationFromPostCode(POSTCODE)).thenReturn(Optional.of(location));
+    propertyAlignmentService.alignPropertyRecord(pricePaidTransactionInput);
+
+    verify(postCodeGeoCodingService).getGeoLocationFromPostCode(POSTCODE);
+
+    verify(propertyRepository).addTransactionsForProperty(PROPERTY_ID, transactions, DATEUPDATED);
+    verify(propertyRepository, never()).updatePropertyDetails(propertyUpdate);
+    verify(propertyRepository).updatePropertyLocation(propertyUpdate, location);
+  }
+
+  @Test
   void alignPropertyRecordOnExistingPropertyWherePropertyUpdateRequiredForAdditionalTransaction() {
     final PricePaidTransactionInput pricePaidTransactionInput = getPricePaidTransactionInput(
         InputAction.ADDITION);

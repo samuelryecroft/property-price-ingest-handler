@@ -1,5 +1,11 @@
 package guru.data.property.price.ingest.handler.repository;
 
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.LAST_UPDATED_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.LATEST_DATA_DATE_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.LOCATION_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.PROPERTY_ID_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.PROPERTY_TYPE_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.TRANSACTION_FIELD;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -54,11 +60,11 @@ class PropertyUpdateRepositoryImplTest {
     propertyUpdateRepository.removeTransactionsForProperty(PROPERTY_ID, saleTransactions, LATEST_DATA_DATE);
 
     verify(mongoTemplate).updateFirst(
-        query(where("_id").is(PROPERTY_ID)),
+        query(where(PROPERTY_ID_FIELD).is(PROPERTY_ID)),
         new Update()
-            .pull("transactions", query(Criteria.where("_id").is(TRANSACTION_ID)))
-            .set("lastUpdated", LocalDate.now())
-            .set("latestDataDate", LATEST_DATA_DATE),
+            .pull(TRANSACTION_FIELD, query(Criteria.where("_id").is(TRANSACTION_ID)))
+            .set(LAST_UPDATED_FIELD, LocalDate.now())
+            .set(LATEST_DATA_DATE_FIELD, LATEST_DATA_DATE),
         Property.class
     );
   }
@@ -69,20 +75,20 @@ class PropertyUpdateRepositoryImplTest {
     propertyUpdateRepository.updateTransactionForProperty(PROPERTY_ID, saleTransactions, LATEST_DATA_DATE);
 
     verify(mongoTemplate).updateFirst(
-        query(where("_id").is(PROPERTY_ID)),
+        query(where(PROPERTY_ID_FIELD).is(PROPERTY_ID)),
         new Update()
-            .pull("transactions", query(Criteria.where("_id").is(TRANSACTION_ID)))
-            .set("lastUpdated", LocalDate.now())
-            .set("latestDataDate", LATEST_DATA_DATE),
+            .pull(TRANSACTION_FIELD, query(Criteria.where("_id").is(TRANSACTION_ID)))
+            .set(LAST_UPDATED_FIELD, LocalDate.now())
+            .set(LATEST_DATA_DATE_FIELD, LATEST_DATA_DATE),
         Property.class
     );
 
     verify(mongoTemplate).updateFirst(
-        query(where("_id").is(PROPERTY_ID)),
+        query(where(PROPERTY_ID_FIELD).is(PROPERTY_ID)),
         new Update()
-            .push("transactions").each(saleTransactions)
-            .set("lastUpdated", LocalDate.now())
-            .set("latestDataDate", LATEST_DATA_DATE),
+            .push(TRANSACTION_FIELD).each(saleTransactions)
+            .set(LAST_UPDATED_FIELD, LocalDate.now())
+            .set(LATEST_DATA_DATE_FIELD, LATEST_DATA_DATE),
         Property.class
     );
   }
@@ -94,12 +100,12 @@ class PropertyUpdateRepositoryImplTest {
     propertyUpdateRepository.addTransactionsForProperty(PROPERTY_ID, saleTransactions, LATEST_DATA_DATE);
 
     verify(mongoTemplate).updateFirst(
-        query(where("_id").is(PROPERTY_ID)
-            .and("transactions").not().elemMatch(Criteria.where("_id").is(TRANSACTION_ID))),
+        query(where(PROPERTY_ID_FIELD).is(PROPERTY_ID)
+            .and(TRANSACTION_FIELD).not().elemMatch(Criteria.where("_id").is(TRANSACTION_ID))),
         new Update()
-            .push("transactions", saleTransaction)
-            .set("lastUpdated", LocalDate.now())
-            .set("latestDataDate", LATEST_DATA_DATE),
+            .push(TRANSACTION_FIELD, saleTransaction)
+            .set(LAST_UPDATED_FIELD, LocalDate.now())
+            .set(LATEST_DATA_DATE_FIELD, LATEST_DATA_DATE),
         Property.class
     );
   }
@@ -114,11 +120,11 @@ class PropertyUpdateRepositoryImplTest {
     propertyUpdateRepository.updatePropertyDetails(property);
 
     verify(mongoTemplate).updateFirst(
-        query(where("_id").is(PROPERTY_ID)
-            .and("latestDataDate").lte(LATEST_DATA_DATE)),
+        query(where(PROPERTY_ID_FIELD).is(PROPERTY_ID)
+            .and(LATEST_DATA_DATE_FIELD).lte(LATEST_DATA_DATE)),
         new Update()
-            .set("propertyType", PropertyType.DETACHED)
-            .set("latestDataDate", LATEST_DATA_DATE),
+            .set(PROPERTY_TYPE_FIELD, PropertyType.DETACHED)
+            .set(LATEST_DATA_DATE_FIELD, LATEST_DATA_DATE),
         Property.class
     );
   }
@@ -132,10 +138,10 @@ class PropertyUpdateRepositoryImplTest {
     propertyUpdateRepository.updatePropertyLocation(property, geoLocation);
 
     verify(mongoTemplate).updateFirst(
-        query(where("_id").is(PROPERTY_ID)
-            .and("latestDataDate").lte(LATEST_DATA_DATE)),
+        query(where(PROPERTY_ID_FIELD).is(PROPERTY_ID)
+            .and(LATEST_DATA_DATE_FIELD).lte(LATEST_DATA_DATE)),
         new Update()
-            .set("location", geoLocation),
+            .set(LOCATION_FIELD, geoLocation),
         Property.class
     );
   }

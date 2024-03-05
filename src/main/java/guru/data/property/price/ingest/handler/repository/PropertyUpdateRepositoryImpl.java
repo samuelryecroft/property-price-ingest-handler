@@ -1,5 +1,11 @@
 package guru.data.property.price.ingest.handler.repository;
 
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.LAST_UPDATED_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.LATEST_DATA_DATE_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.LOCATION_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.PROPERTY_ID_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.PROPERTY_TYPE_FIELD;
+import static guru.data.property.price.ingest.handler.constants.DatabaseFields.TRANSACTION_FIELD;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
@@ -28,11 +34,11 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
 
     transactions.forEach(transaction ->
       mongoTemplate.updateFirst(
-          query(where("_id").is(propertyId)),
+          query(where(PROPERTY_ID_FIELD).is(propertyId)),
           new Update()
-              .pull("transactions", new Query(Criteria.where("_id").is(transaction.getId())))
-              .set("lastUpdated", LocalDate.now())
-              .set("latestDataDate", latestDataDate),
+              .pull(TRANSACTION_FIELD, new Query(Criteria.where("_id").is(transaction.getId())))
+              .set(LAST_UPDATED_FIELD, LocalDate.now())
+              .set(LATEST_DATA_DATE_FIELD, latestDataDate),
           Property.class)
     );
   }
@@ -42,11 +48,11 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
     removeTransactionsForProperty(propertyId, transactions, latestDataDate);
 
     mongoTemplate.updateFirst(
-        query(where("_id").is(propertyId)),
+        query(where(PROPERTY_ID_FIELD).is(propertyId)),
         new Update()
-            .push("transactions").each(transactions)
-            .set("lastUpdated", LocalDate.now())
-            .set("latestDataDate", latestDataDate),
+            .push(TRANSACTION_FIELD).each(transactions)
+            .set(LAST_UPDATED_FIELD, LocalDate.now())
+            .set(LATEST_DATA_DATE_FIELD, latestDataDate),
         Property.class);
   }
 
@@ -55,12 +61,12 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
 
     transactions.forEach(transaction ->
       mongoTemplate.updateFirst(
-          query(where("_id").is(propertyId)
-              .and("transactions").not().elemMatch(Criteria.where("_id").is(transaction.getId()))),
+          query(where(PROPERTY_ID_FIELD).is(propertyId)
+              .and(TRANSACTION_FIELD).not().elemMatch(Criteria.where("_id").is(transaction.getId()))),
           new Update()
-              .push("transactions", transaction)
-              .set("lastUpdated", LocalDate.now())
-              .set("latestDataDate", latestDataDate),
+              .push(TRANSACTION_FIELD, transaction)
+              .set(LAST_UPDATED_FIELD, LocalDate.now())
+              .set(LATEST_DATA_DATE_FIELD, latestDataDate),
           Property.class)
     );
 
@@ -70,11 +76,11 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
   public void updatePropertyDetails(Property property) {
 
     mongoTemplate.updateFirst(
-        query(where("_id").is(property.getId()).and("latestDataDate")
+        query(where(PROPERTY_ID_FIELD).is(property.getId()).and(LATEST_DATA_DATE_FIELD)
             .lte(property.getLatestTransactionDate())),
         new Update()
-            .set("propertyType", property.getPropertyType())
-            .set("latestDataDate", property.getLatestTransactionDate()),
+            .set(PROPERTY_TYPE_FIELD, property.getPropertyType())
+            .set(LATEST_DATA_DATE_FIELD, property.getLatestTransactionDate()),
         Property.class
     );
   }
@@ -82,10 +88,10 @@ public class PropertyUpdateRepositoryImpl implements PropertyUpdateRepository {
   @Override
   public void updatePropertyLocation(Property property, GeoLocation geoLocation) {
     mongoTemplate.updateFirst(
-        query(where("_id").is(property.getId()).and("latestDataDate")
+        query(where(PROPERTY_ID_FIELD).is(property.getId()).and(LATEST_DATA_DATE_FIELD)
             .lte(property.getLatestTransactionDate())),
         new Update()
-            .set("location", geoLocation),
+            .set(LOCATION_FIELD, geoLocation),
         Property.class
     );
   }

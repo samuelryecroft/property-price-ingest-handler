@@ -1,0 +1,37 @@
+services:
+  ingest-handler:
+    image: ghcr.io/samuelryecroft/property-price-ingest-handler:latest
+    environment:
+      DB_URL: ${MONGO_DB_URL}
+      DB: property-data-ingest
+
+    depends_on:
+      postcode-io:
+        condition: service_started
+      rabbit-mq:
+        condition: service_started
+
+  rabbit-mq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 5433:5432
+      - 15672:15672
+
+    networks:
+      ingest:
+        aliases:
+          - rabbit-mq
+
+  postcode-io:
+    image: idealpostcodes/postcodes.io.db
+    ports:
+      - 5432:5432
+    networks:
+      ingest:
+        aliases:
+          - postcode-io
+
+networks:
+  ingest:
+    name: ingest-network

@@ -1,11 +1,14 @@
 spring:
-
+  rabbitmq:
+    username: ${RABBIT_USER:guest}
+    password: ${RABBIT_PASSWORD:guest}
+    host: ${RABBIT_HOST:localhost}
   data:
     mongodb:
       uri: ${DB_URL}
       database: ${DB}
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://${POSTCODE_IO_HOST:localhost}:${POSTCODE_IO_PORT:5432}/postgres
     username: postgres
     password: postgres
   jpa:
